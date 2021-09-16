@@ -1,6 +1,8 @@
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Rentalx.Models;
@@ -11,9 +13,17 @@ namespace Rentalx
 {
     public class Startup
     {
+        public IConfiguration Configuration { get; }
+
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<RentalxContext>(opt => opt.UseInMemoryDatabase("Rentalx"));
+            //services.AddDbContext<RentalxContext>(opt => opt.UseInMemoryDatabase("Rentalx"));
+            services.AddDbContext<RentalxContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddScoped<ICreateCategoryService, CreateCategoryService>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
@@ -32,7 +42,6 @@ namespace Rentalx
             {
                 app.UseDeveloperExceptionPage();
             }
-
 
             app.UseRouting();
 
